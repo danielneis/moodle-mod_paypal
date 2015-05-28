@@ -47,7 +47,7 @@ class backup_paypal_activity_structure_step extends backup_activity_structure_st
 
         // Define the root element describing the paypal instance.
         $paypal = new backup_nested_element('paypal', array('id'), array(
-            'name', 'intro', 'introformat', 'grade'));
+            'name', 'intro', 'introformat', 'grade', 'completionenabled'));
 
         // If we had more elements, we would build the tree here.
 

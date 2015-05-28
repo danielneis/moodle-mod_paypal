@@ -28,12 +28,15 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['modulename'] = 'paypal';
-$string['modulenameplural'] = 'paypals';
-$string['modulename_help'] = 'Use the paypal module for... | The paypal module allows...';
+$string['paymentcompletionenabled'] = 'Student must make a payment to complete this activity';
+$string['modulename'] = 'Paypal';
+$string['modulenameplural'] = 'Paypals';
+$string['modulename_help'] = 'Use the Paypal module to track completion of payments.';
 $string['paypalfieldset'] = 'Custom example fieldset';
-$string['paypalname'] = 'paypal name';
+$string['paypalname'] = 'Paypal activity name';
 $string['paypalname_help'] = 'This is the content of the help tooltip associated with the paypalname field. Markdown syntax is supported.';
-$string['paypal'] = 'paypal';
+$string['paypal'] = 'Paypal';
 $string['pluginadministration'] = 'paypal administration';
-$string['pluginname'] = 'paypal';
+$string['pluginname'] = 'Paypal';
+$string['requirepayment'] = 'Require payment';
+$string['requirepayment_help'] = 'If you want to track completion when user make payments, mark this option.';

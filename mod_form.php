@@ -60,7 +60,7 @@ class mod_paypal_mod_form extends moodleform_mod {
         $mform->addHelpButton('name', 'paypalname', 'paypal');
 
         // Adding the standard "intro" and "introformat" fields.
-        $this->add_intro_editor();
+        $this->standard_intro_elements();
 
         // Adding the rest of paypal settings, spreading all them into this fieldset
         // ... or adding more fieldsets ('header' elements) if needed for better logic.
@@ -77,5 +77,26 @@ class mod_paypal_mod_form extends moodleform_mod {
 
         // Add standard buttons, common to all modules.
         $this->add_action_buttons();
+    }
+
+    function add_completion_rules() {
+        $mform =& $this->_form;
+
+        $mform->addElement('checkbox', 'paymentcompletionenabled', get_string('requirepayment', 'paypal'), get_string('paymentcompletionenabled','paypal'));
+        $mform->addHelpButton('paymentcompletionenabled', 'requirepayment', 'paypal');
+
+        return array('paymentcompletionenabled');
+    }
+
+    function completion_rule_enabled($data) {
+            return !empty($data->paymentcompletionenabled);
+    }
+
+    function get_data() {
+        $data = parent::get_data();
+        if (!isset($data->paymentcompletionenabled)) {
+            $data->paymentcompletionenabled = 0;
+        }
+        return $data;
     }
 }

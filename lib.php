@@ -57,6 +57,8 @@ function paypal_supports($feature) {
             return true;
         case FEATURE_BACKUP_MOODLE2:
             return true;
+        case FEATURE_COMPLETION_HAS_RULES:
+            return true;
         default:
             return null;
     }
@@ -446,4 +448,33 @@ function paypal_extend_navigation(navigation_node $navref, stdClass $course, std
  */
 function paypal_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $paypalnode=null) {
     // TODO Delete this function and its docblock, or implement it.
+}
+
+/**
+ * Obtains the automatic completion state for this forum based on any conditions
+ * in forum settings.
+ *
+ * @param object $course Course
+ * @param object $cm Course-module
+ * @param int $userid User ID
+ * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
+ * @return bool True if completed, false if not, $type if conditions not set.
+ */
+function paypal_get_completion_state($course, $cm, $userid, $type) {
+    global $DB;
+
+    // Get forum details
+    if (!$paypal = $DB->get_record('forum',array('id'=>$cm->instance))) {
+        throw new Exception("Can't find paypal {$cm->instance}");
+    }
+
+    // If completion option is enabled, evaluate it and return true/false 
+    if($paypal->paymentcompletionenabled) {
+        // Check if payment was done
+        return true;
+        return false;
+    } else {
+        // Completion option is not enabled so just return $type .
+        return $type;
+    }
 }

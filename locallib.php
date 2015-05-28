@@ -33,6 +33,10 @@ defined('MOODLE_INTERNAL') || die();
  * @param array $things
  * @return object
  *function paypal_do_something_useful(array $things) {
- *    return new stdClass();
+ *    // Update completion state
+ *    $completion=new completion_info($course);
+ *    if($completion->is_enabled($cm) && $paypal->paymentcompletionenabled ) {
+ *        $completion->update_state($cm, COMPLETION_COMPLETE);
+ *    }
  *}
  */
