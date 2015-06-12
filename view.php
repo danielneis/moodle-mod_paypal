@@ -71,13 +71,90 @@ $PAGE->set_heading(format_string($course->fullname));
 // Output starts here.
 echo $OUTPUT->header();
 
+// Replace the following lines with you own code.
+echo $OUTPUT->heading($paypal->name);
+
 // Conditions to show the intro can change to look for own settings or whatever.
 if ($paypal->intro) {
     echo $OUTPUT->box(format_module_intro('paypal', $paypal, $cm->id), 'generalbox mod_introbox', 'paypalintro');
 }
 
-// Replace the following lines with you own code.
-echo $OUTPUT->heading('Yay! It works!');
+// TODO: verify if payment was made
 
+// Calculate localised and "." cost, make sure we send PayPal the same value,
+// please note PayPal expects amount with 2 decimal places and "." separator.
+$localisedcost = format_float($paypal->cost, 2, true);
+$cost = format_float($paypal->cost, 2, false);
+
+if (isguestuser()) { // force login only for guest user, not real users with guest role
+    if (empty($CFG->loginhttps)) {
+        $wwwroot = $CFG->wwwroot;
+    } else {
+        // This actually is not so secure ;-), 'cause we're
+        // in unencrypted connection...
+        $wwwroot = str_replace("http://", "https://", $CFG->wwwroot);
+    }
+    echo '<div class="mdl-align"><p>'.get_string('paymentrequired').'</p>';
+    echo '<p><b>'.get_string('cost').": $instance->currency $localisedcost".'</b></p>';
+    echo '<p><a href="'.$wwwroot.'/login/">'.get_string('loginsite').'</a></p>';
+    echo '</div>';
+} else {
+    //Sanitise some fields before building the PayPal form
+    $coursefullname  = format_string($course->fullname, true, array('context' => $PAGE->context));
+    $courseshortname = $course->shortname;
+    $userfullname    = fullname($USER);
+    $userfirstname   = $USER->firstname;
+    $userlastname    = $USER->lastname;
+    $useraddress     = $USER->address;
+    $usercity        = $USER->city;
+    $instancename    = $paypal->name;
+?>
+<div align="center">
+
+<p><?php print_string("paymentrequired") ?></p>
+<p><b><?php echo get_string("cost").": {$paypal->currency} {$localisedcost}"; ?></b></p>
+<p><img alt="<?php print_string('paypalaccepted', 'enrol_paypal') ?>" src="https://www.paypal.com/en_US/i/logo/PayPal_mark_60x38.gif" /></p>
+<p><?php print_string("paymentinstant") ?></p>
+<?php
+    $paypalurl = empty($CFG->usepaypalsandbox) ? 'https://www.paypal.com/cgi-bin/webscr' : 'https://www.sandbox.paypal.com/cgi-bin/webscr';
+?>
+<form action="<?php echo $paypalurl ?>" method="post">
+
+<input type="hidden" name="cmd" value="_xclick" />
+<input type="hidden" name="charset" value="utf-8" />
+<input type="hidden" name="business" value="<?php p($paypal->businessemail)?>" />
+<input type="hidden" name="item_name" value="<?php p($coursefullname) ?>" />
+<input type="hidden" name="item_number" value="<?php p($courseshortname) ?>" />
+<input type="hidden" name="quantity" value="1" />
+<input type="hidden" name="on0" value="<?php print_string("user") ?>" />
+<input type="hidden" name="os0" value="<?php p($userfullname) ?>" />
+<input type="hidden" name="custom" value="<?php echo "{$USER->id}-{$course->id}-{$paypal->id}" ?>" />
+
+<input type="hidden" name="currency_code" value="<?php p($paypal->currency) ?>" />
+<input type="hidden" name="amount" value="<?php p($cost) ?>" />
+
+<input type="hidden" name="for_auction" value="false" />
+<input type="hidden" name="no_note" value="1" />
+<input type="hidden" name="no_shipping" value="1" />
+<input type="hidden" name="notify_url" value="<?php echo "{$CFG->wwwroot}/mod/paypal/ipn.php" ?>" />
+<input type="hidden" name="return" value="<?php echo "{$CFG->wwwroot}/mod/paypal/view.php?id={$id}" ?>" />
+<input type="hidden" name="cancel_return" value="<?php echo "{$CFG->wwwroot}/mod/paypal/view.php?id={$id}" ?>" />
+<input type="hidden" name="rm" value="2" />
+<input type="hidden" name="cbt" value="<?php print_string("continuetocourse") ?>" />
+
+<input type="hidden" name="first_name" value="<?php p($userfirstname) ?>" />
+<input type="hidden" name="last_name" value="<?php p($userlastname) ?>" />
+<input type="hidden" name="address" value="<?php p($useraddress) ?>" />
+<input type="hidden" name="city" value="<?php p($usercity) ?>" />
+<input type="hidden" name="email" value="<?php p($USER->email) ?>" />
+<input type="hidden" name="country" value="<?php p($USER->country) ?>" />
+
+<input type="submit" value="<?php print_string("sendpaymentbutton", "enrol_paypal") ?>" />
+
+</form>
+
+</div>
+<?php
+}
 // Finish the page.
 echo $OUTPUT->footer();
