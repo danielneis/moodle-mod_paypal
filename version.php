@@ -21,16 +21,16 @@
  * See https://docs.moodle.org/dev/version.php for more info.
  *
  * @package    mod_paypal
- * @copyright  2015 Your Name <your@email.address>
+ * @copyright  2015 Daniel Neis - based on work of others
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_paypal';
-$plugin->version = 2015052800;
-$plugin->release = 'v0.0';
+$plugin->version = 2015061200;
+$plugin->release = '1';
 $plugin->requires = 2014051200;
-$plugin->maturity = MATURITY_ALPHA;
+$plugin->maturity = MATURITY_BETA;
 $plugin->cron = 0;
 $plugin->dependencies = array();
