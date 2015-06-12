@@ -78,6 +78,17 @@ class mod_paypal_mod_form extends moodleform_mod {
         $this->add_action_buttons();
     }
 
+    function validation($data, $files) {
+        $errors = array();
+        if (empty($data['businessemail'])) {
+            $errors['businessemail'] = get_string('emptybusinessemail', 'paypal');
+        }
+        if (empty($data['cost'])) {
+            $errors['cost'] = get_string('emptycost', 'paypal');
+        }
+        return $errors;
+    }
+
     function add_completion_rules() {
         $mform =& $this->_form;
 

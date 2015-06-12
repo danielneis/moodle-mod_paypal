@@ -89,6 +89,8 @@ if (! $plugin_instance = $DB->get_record("paypal", array("id"=>$data->instanceid
     die;
 }
 
+$cm = get_coursemodule_from_instance('paypal', $data->instanceid);
+
 /// Open a connection back to PayPal to validate the data
 $paypaladdr = empty($CFG->usepaypalsandbox) ? 'www.paypal.com' : 'www.sandbox.paypal.com';
 $c = new curl();
@@ -167,14 +169,12 @@ if (strlen($result) > 0) {
         if ($existing = $DB->get_record("paypal_txn", array("txn_id"=>$data->txn_id))) {   // Make sure this transaction doesn't exist already
             message_paypal_error_to_admin("Transaction $data->txn_id is being repeated!", $data);
             die;
-
         }
 
-        if (core_text::strtolower($data->business) !== core_text::strtolower($plugin_instance->businessemail))) {   // Check that the email is the one we want it to be
+        if (core_text::strtolower($data->business) !== core_text::strtolower($plugin_instance->businessemail)) {   // Check that the email is the one we want it to be
             message_paypal_error_to_admin("Business email is {$data->business} (not ".
                     $plugin_instance->businessemail.")", $data);
             die;
-
         }
 
         if (!$user = $DB->get_record('user', array('id'=>$data->userid))) {   // Check that user exists
@@ -207,6 +207,11 @@ if (strlen($result) > 0) {
         // ALL CLEAR !
 
         $DB->insert_record("mod_paypal", $data);
+        // Update completion state
+        $completion=new completion_info($course);
+        if ($completion->is_enabled($cm) && $plugin_instance->paymentcompletionenabled ) {
+            $completion->update_state($cm, COMPLETION_COMPLETE);
+        }
 
         // Pass $view=true to filter hidden caps if the user cannot see them
         if ($users = get_users_by_capability($context, 'moodle/course:update', 'u.*', 'u.id ASC',
@@ -221,7 +226,6 @@ if (strlen($result) > 0) {
         $mailteachers = $plugin->get_config('mailteachers');
         $mailadmins   = $plugin->get_config('mailadmins');
         $shortname = format_string($course->shortname, true, array('context' => $context));
-
 
         if (!empty($mailstudents)) {
             $a = new stdClass();
