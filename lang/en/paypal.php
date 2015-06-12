@@ -28,6 +28,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['cost'] = 'Cost';
+$string['currency'] = 'Currency';
+$string['businessemail'] = 'Business email';
 $string['paymentcompletionenabled'] = 'Student must make a payment to complete this activity';
 $string['modulename'] = 'Paypal';
 $string['modulenameplural'] = 'Paypals';

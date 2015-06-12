@@ -25,18 +25,11 @@
  * Moodle is performing actions across all modules.
  *
  * @package    mod_paypal
- * @copyright  2015 Your Name
+ * @copyright  2015 Daniel Neis
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
-
-/**
- * Example constant, you probably want to remove this :-)
- */
-define('NEWMODULE_ULTIMATE_ANSWER', 42);
-
-/* Moodle core API */
 
 /**
  * Returns the information on whether the module supports a feature
@@ -53,12 +46,16 @@ function paypal_supports($feature) {
             return true;
         case FEATURE_SHOW_DESCRIPTION:
             return true;
-        case FEATURE_GRADE_HAS_GRADE:
-            return true;
         case FEATURE_BACKUP_MOODLE2:
             return true;
         case FEATURE_COMPLETION_HAS_RULES:
             return true;
+        case FEATURE_GRADE_HAS_GRADE:
+            return false;
+        case FEATURE_GROUPS:
+            return false;
+        case FEATURE_GROUPINGS:
+            return false;
         default:
             return null;
     }
@@ -299,6 +296,7 @@ function paypal_scale_used_anywhere($scaleid) {
  * @return void
  */
 function paypal_grade_item_update(stdClass $paypal, $reset=false) {
+    /*
     global $CFG;
     require_once($CFG->libdir.'/gradelib.php');
 
@@ -323,6 +321,7 @@ function paypal_grade_item_update(stdClass $paypal, $reset=false) {
 
     grade_update('mod/paypal', $paypal->course, 'mod', 'paypal',
             $paypal->id, 0, null, $item);
+    */
 }
 
 /**
@@ -421,35 +420,6 @@ function paypal_pluginfile($course, $cm, $context, $filearea, array $args, $forc
     send_file_not_found();
 }
 
-/* Navigation API */
-
-/**
- * Extends the global navigation tree by adding paypal nodes if there is a relevant content
- *
- * This can be called by an AJAX request so do not rely on $PAGE as it might not be set up properly.
- *
- * @param navigation_node $navref An object representing the navigation tree node of the paypal module instance
- * @param stdClass $course current course record
- * @param stdClass $module current paypal instance record
- * @param cm_info $cm course module information
- */
-function paypal_extend_navigation(navigation_node $navref, stdClass $course, stdClass $module, cm_info $cm) {
-    // TODO Delete this function and its docblock, or implement it.
-}
-
-/**
- * Extends the settings navigation with the paypal settings
- *
- * This function is called when the context for the page is a paypal module. This is not called by AJAX
- * so it is safe to rely on the $PAGE.
- *
- * @param settings_navigation $settingsnav complete settings navigation tree
- * @param navigation_node $paypalnode paypal administration node
- */
-function paypal_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $paypalnode=null) {
-    // TODO Delete this function and its docblock, or implement it.
-}
-
 /**
  * Obtains the automatic completion state for this forum based on any conditions
  * in forum settings.
@@ -464,12 +434,12 @@ function paypal_get_completion_state($course, $cm, $userid, $type) {
     global $DB;
 
     // Get forum details
-    if (!$paypal = $DB->get_record('forum',array('id'=>$cm->instance))) {
+    if (!$paypal = $DB->get_record('paypal',array('id'=>$cm->instance))) {
         throw new Exception("Can't find paypal {$cm->instance}");
     }
 
     // If completion option is enabled, evaluate it and return true/false 
-    if($paypal->paymentcompletionenabled) {
+    if ($paypal->paymentcompletionenabled) {
         // Check if payment was done
         return true;
         return false;

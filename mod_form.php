@@ -45,10 +45,8 @@ class mod_paypal_mod_form extends moodleform_mod {
 
         $mform = $this->_form;
 
-        // Adding the "general" fieldset, where all the common settings are showed.
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        // Adding the standard "name" field.
         $mform->addElement('text', 'name', get_string('paypalname', 'paypal'), array('size' => '64'));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
@@ -59,23 +57,24 @@ class mod_paypal_mod_form extends moodleform_mod {
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('name', 'paypalname', 'paypal');
 
-        // Adding the standard "intro" and "introformat" fields.
         $this->standard_intro_elements();
 
-        // Adding the rest of paypal settings, spreading all them into this fieldset
-        // ... or adding more fieldsets ('header' elements) if needed for better logic.
-        $mform->addElement('static', 'label1', 'paypalsetting1', 'Your paypal fields go here. Replace me!');
+        $mform->addElement('text', 'businessemail', get_string('businessemail', 'paypal'));
+        $mform->setType('businessemail', PARAM_EMAIL);
+        $mform->setDefault('businessemail', '');
 
-        $mform->addElement('header', 'paypalfieldset', get_string('paypalfieldset', 'paypal'));
-        $mform->addElement('static', 'label2', 'paypalsetting2', 'Your paypal fields go here. Replace me!');
+        $mform->addElement('text', 'cost', get_string('cost', 'paypal'), array('size'=>4));
+        $mform->setType('cost', PARAM_FLOAT);
+        $mform->setDefault('cost', format_float(0, 2, true));
 
-        // Add standard grading elements.
+        $paypalcurrencies = $this->get_currencies();
+        $mform->addElement('select', 'currency', get_string('currency', 'paypal'), $paypalcurrencies);
+        $mform->setDefault('currency', 'BRL');
+
         $this->standard_grading_coursemodule_elements();
 
-        // Add standard elements, common to all modules.
         $this->standard_coursemodule_elements();
 
-        // Add standard buttons, common to all modules.
         $this->add_action_buttons();
     }
 
@@ -89,14 +88,20 @@ class mod_paypal_mod_form extends moodleform_mod {
     }
 
     function completion_rule_enabled($data) {
-            return !empty($data->paymentcompletionenabled);
+        return $data['paymentcompletionenabled'];
     }
 
-    function get_data() {
-        $data = parent::get_data();
-        if (!isset($data->paymentcompletionenabled)) {
-            $data->paymentcompletionenabled = 0;
+    public function get_currencies() {
+        // See https://www.paypal.com/cgi-bin/webscr?cmd=p/sell/mc/mc_intro-outside,
+        // 3-character ISO-4217: https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_currency_codes
+        $codes = array(
+            'AUD', 'BRL', 'CAD', 'CHF', 'CZK', 'DKK', 'EUR', 'GBP', 'HKD', 'HUF', 'ILS', 'JPY',
+            'MXN', 'MYR', 'NOK', 'NZD', 'PHP', 'PLN', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'TWD', 'USD');
+        $currencies = array();
+        foreach ($codes as $c) {
+            $currencies[$c] = new lang_string($c, 'core_currencies');
         }
-        return $data;
+
+        return $currencies;
     }
 }
