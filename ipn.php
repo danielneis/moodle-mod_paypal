@@ -22,15 +22,13 @@
  * If PayPal verifies this then it sets up the enrolment for that
  * user.
  *
- * @package    enrol_paypal
+ * @package    mod_paypal
  * @copyright 2010 Eugene Venter
+ * @copyright 2015 Daniel Neis
  * @author     Eugene Venter - based on code by others
+ * @author     Daniel Neis - based on code by others
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-// Disable moodle specific debug messages and any errors in output,
-// comment out when debugging or better look into error log!
-define('NO_DEBUG_DISPLAY', true);
 
 require("../../config.php");
 require_once("lib.php");
@@ -69,7 +67,6 @@ $data->payment_gross    = $data->mc_gross;
 $data->payment_currency = $data->mc_currency;
 $data->timeupdated      = time();
 
-
 /// get the user and course records
 
 if (! $user = $DB->get_record("user", array("id"=>$data->userid))) {
@@ -87,12 +84,10 @@ if (! $context = context_course::instance($course->id, IGNORE_MISSING)) {
     die;
 }
 
-if (! $plugin_instance = $DB->get_record("enrol", array("id"=>$data->instanceid, "status"=>0))) {
+if (! $plugin_instance = $DB->get_record("paypal", array("id"=>$data->instanceid))) {
     message_paypal_error_to_admin("Not a valid instance id", $data);
     die;
 }
-
-$plugin = enrol_get_plugin('paypal');
 
 /// Open a connection back to PayPal to validate the data
 $paypaladdr = empty($CFG->usepaypalsandbox) ? 'www.paypal.com' : 'www.sandbox.paypal.com';
@@ -126,8 +121,8 @@ if (strlen($result) > 0) {
         // and notify admin
 
         if ($data->payment_status != "Completed" and $data->payment_status != "Pending") {
-            $plugin->unenrol_user($plugin_instance, $data->userid);
-            message_paypal_error_to_admin("Status not completed or pending. User unenrolled from course", $data);
+            // TODO: set payment status for student
+            message_paypal_error_to_admin("Status not completed or pending. User payment status updated", $data);
             die;
         }
 
@@ -144,8 +139,8 @@ if (strlen($result) > 0) {
         if ($data->payment_status == "Pending" and $data->pending_reason != "echeck") {
             $eventdata = new stdClass();
             $eventdata->modulename        = 'moodle';
-            $eventdata->component         = 'enrol_paypal';
-            $eventdata->name              = 'paypal_enrolment';
+            $eventdata->component         = 'mod_paypal';
+            $eventdata->name              = 'paypal_mod';
             $eventdata->userfrom          = get_admin();
             $eventdata->userto            = $user;
             $eventdata->subject           = "Moodle: PayPal payment";
@@ -169,17 +164,15 @@ if (strlen($result) > 0) {
 
         // At this point we only proceed with a status of completed or pending with a reason of echeck
 
-
-
-        if ($existing = $DB->get_record("enrol_paypal", array("txn_id"=>$data->txn_id))) {   // Make sure this transaction doesn't exist already
+        if ($existing = $DB->get_record("paypal_txn", array("txn_id"=>$data->txn_id))) {   // Make sure this transaction doesn't exist already
             message_paypal_error_to_admin("Transaction $data->txn_id is being repeated!", $data);
             die;
 
         }
 
-        if (core_text::strtolower($data->business) !== core_text::strtolower($plugin->get_config('paypalbusiness'))) {   // Check that the email is the one we want it to be
+        if (core_text::strtolower($data->business) !== core_text::strtolower($plugin_instance->businessemail))) {   // Check that the email is the one we want it to be
             message_paypal_error_to_admin("Business email is {$data->business} (not ".
-                    $plugin->get_config('paypalbusiness').")", $data);
+                    $plugin_instance->businessemail.")", $data);
             die;
 
         }
@@ -209,23 +202,11 @@ if (strlen($result) > 0) {
         if ($data->payment_gross < $cost) {
             message_paypal_error_to_admin("Amount paid is not enough ($data->payment_gross < $cost))", $data);
             die;
-
         }
 
         // ALL CLEAR !
 
-        $DB->insert_record("enrol_paypal", $data);
-
-        if ($plugin_instance->enrolperiod) {
-            $timestart = time();
-            $timeend   = $timestart + $plugin_instance->enrolperiod;
-        } else {
-            $timestart = 0;
-            $timeend   = 0;
-        }
-
-        // Enrol user
-        $plugin->enrol_user($plugin_instance, $user->id, $plugin_instance->roleid, $timestart, $timeend);
+        $DB->insert_record("mod_paypal", $data);
 
         // Pass $view=true to filter hidden caps if the user cannot see them
         if ($users = get_users_by_capability($context, 'moodle/course:update', 'u.*', 'u.id ASC',
@@ -301,7 +282,7 @@ if (strlen($result) > 0) {
         }
 
     } else if (strcmp ($result, "INVALID") == 0) { // ERROR
-        $DB->insert_record("enrol_paypal", $data, false);
+        $DB->insert_record("mod_paypal", $data, false);
         message_paypal_error_to_admin("Received an invalid payment notification!! (Fake payment?)", $data);
     }
 }
