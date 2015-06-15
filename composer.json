@@ -1,0 +1,18 @@
+{
+    "name": "danielneis/moodle-mod_paypal",
+    "description": "This is an activity plugin for Moodle that is marked as completed when user makes a payment via PayPal .",
+    "license": "GPLv3",
+    "authors": [
+        {
+            "name": "Daniel Neis Araujo",
+            "email": "danielneis@gmail.com"
+        }
+    ],
+    "type": "moodle-mod",
+    "require": {
+        "composer/installers": "~1.0"
+    },
+    "extra": {
+        "installer-name": "paypal"
+    }
+}
