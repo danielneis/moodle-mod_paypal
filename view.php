@@ -80,8 +80,7 @@ if ($paypal->intro) {
 }
 
 if ($payment_tnx = $DB->get_record('mod_paypal', array('userid' => $USER->id, 'instanceid' => $paypal->id))) {
-    // TODO: should double-check with paypal everytime ?
-
+    // should double-check with paypal everytime ?
     echo get_string('paymentcompleted', 'paypal');
 
 } else {
