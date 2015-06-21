@@ -29,3 +29,8 @@ If there is a transaction for the activity and the current user, instead of disp
 a message telling that the payment was made and activity is completed is shown.
 
 There is a way to verify with paypal if the transaction recorded is really valid, but it is not being done yet.
+
+Funding
+=======
+
+The development of this plugin was funded by TRREE - TRAINING AND RESOURCES IN RESEARCH ETHICS EVALUATION - http://www.trree.org/
