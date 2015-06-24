@@ -143,8 +143,6 @@ if (strlen($result) > 0) {
             $eventdata->fullmessagehtml   = '';
             $eventdata->smallmessage      = '';
             message_send($eventdata);
-
-            paypal_message_error_to_admin("Payment pending", $data);
         }
 
         // If our status is not completed or not pending on an echeck clearance then ignore and die.
@@ -289,10 +287,10 @@ function paypal_message_error_to_admin($subject, $data) {
     $admin = get_admin();
     $site = get_site();
 
-    $message = "$site->fullname:  Transaction failed.\n\n$subject\n\n";
+    $message = "$site->fullname:  Transaction failed:{$subject}";
 
     foreach ($data as $key => $value) {
-        $message .= "$key => $value\n";
+        $message .= "{$key} => {$value};";
     }
 
     $eventdata = new stdClass();
@@ -300,7 +298,7 @@ function paypal_message_error_to_admin($subject, $data) {
     $eventdata->name              = 'payment_error';
     $eventdata->userfrom          = $admin;
     $eventdata->userto            = $admin;
-    $eventdata->subject           = "PAYPAL ERROR: ".$subject;
+    $eventdata->subject           = "PayPal ERROR: ".$subject;
     $eventdata->fullmessage       = $message;
     $eventdata->fullmessageformat = FORMAT_PLAIN;
     $eventdata->fullmessagehtml   = '';
