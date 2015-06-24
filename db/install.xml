@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/paypal/db" VERSION="20150612" COMMENT="XMLDB file for Moodle mod/paypal"
+<XMLDB PATH="mod/paypal/db" VERSION="20150624" COMMENT="XMLDB file for Moodle mod/paypal"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -18,6 +18,8 @@
         <FIELD NAME="businessemail" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="email of the paypal accunt to be credited"/>
         <FIELD NAME="cost" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="how much will be charged"/>
         <FIELD NAME="currency" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="itemname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The item name that will be shown in PayPal form"/>
+        <FIELD NAME="itemnumber" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The item number that will be shown in PayPal form"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -26,7 +28,7 @@
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="mod_paypal" COMMENT="Holds all known information about PayPal transactions">
+    <TABLE NAME="paypal_transactions" COMMENT="Holds all known information about PayPal transactions">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="business" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
@@ -52,6 +54,9 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="course_idx" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
+        <KEY NAME="user_idx" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="instance_idx" TYPE="foreign" FIELDS="instanceid" REFTABLE="paypal" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
   </TABLES>
