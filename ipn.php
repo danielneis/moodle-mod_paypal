@@ -132,9 +132,8 @@ if (strlen($result) > 0) {
         // Email user to let them know. Email admin.
         if ($data->payment_status == "Pending" and $data->pending_reason != "echeck") {
             $eventdata = new stdClass();
-            $eventdata->modulename        = 'moodle';
             $eventdata->component         = 'mod_paypal';
-            $eventdata->name              = 'paypal_payment_pending';
+            $eventdata->name              = 'payment_pending';
             $eventdata->userfrom          = get_admin();
             $eventdata->userto            = $user;
             $eventdata->subject           = get_string("paypalpaymentpendingsubject", 'paypal');
@@ -231,9 +230,8 @@ if (strlen($result) > 0) {
             $a->profileurl = "$CFG->wwwroot/user/view.php?id=$user->id";
 
             $eventdata = new stdClass();
-            $eventdata->modulename        = 'moodle';
             $eventdata->component         = 'mod_paypal';
-            $eventdata->name              = 'paypal_payment_completed';
+            $eventdata->name              = 'payment_completed';
             $eventdata->userfrom          = empty($teacher) ? core_user::get_support_user() : $teacher;
             $eventdata->userto            = $user;
             $eventdata->subject           = get_string("paypalpaymentcompletedsubject", 'paypal');
@@ -249,9 +247,8 @@ if (strlen($result) > 0) {
             $a->user = fullname($user);
 
             $eventdata = new stdClass();
-            $eventdata->modulename        = 'moodle';
             $eventdata->component         = 'mod_paypal';
-            $eventdata->name              = 'paypal_payment_completed';
+            $eventdata->name              = 'payment_completed';
             $eventdata->userfrom          = $user;
             $eventdata->userto            = $teacher;
             $eventdata->subject           = get_string("paypalpaymentcompletedsubject", 'paypal');
@@ -268,9 +265,8 @@ if (strlen($result) > 0) {
             $admins = get_admins();
             foreach ($admins as $admin) {
                 $eventdata = new stdClass();
-                $eventdata->modulename        = 'moodle';
                 $eventdata->component         = 'mod_paypal';
-                $eventdata->name              = 'paypal_payment_completed';
+                $eventdata->name              = 'payment_completed';
                 $eventdata->userfrom          = $user;
                 $eventdata->userto            = $admin;
                 $eventdata->subject           = get_string("paypalpaymentcompletedsubject", 'paypal');
@@ -300,9 +296,8 @@ function paypal_message_error_to_admin($subject, $data) {
     }
 
     $eventdata = new stdClass();
-    $eventdata->modulename        = 'moodle';
     $eventdata->component         = 'mod_paypal';
-    $eventdata->name              = 'paypal_payment';
+    $eventdata->name              = 'payment_error';
     $eventdata->userfrom          = $admin;
     $eventdata->userto            = $admin;
     $eventdata->subject           = "PAYPAL ERROR: ".$subject;

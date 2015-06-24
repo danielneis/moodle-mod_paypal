@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $messageproviders = array(
-    'paypal_payment_pending' => array(),
-    'paypal_payment_completed' => array(),
+    'payment_pending' => array(),
+    'payment_completed' => array(),
+    'payment_error' => array(),
 );

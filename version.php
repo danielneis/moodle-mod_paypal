@@ -28,7 +28,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_paypal';
-$plugin->version = 2015062400;
+$plugin->version = 2015062401;
 $plugin->release = '1';
 $plugin->requires = 2014051200;
 $plugin->maturity = MATURITY_BETA;
