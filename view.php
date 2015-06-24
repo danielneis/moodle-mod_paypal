@@ -47,6 +47,8 @@ if ($id) {
 
 require_login($course, true, $cm);
 
+require_capability('mod/paypal:view', $PAGE->context);
+
 $event = \mod_paypal\event\course_module_viewed::create(array(
     'objectid' => $PAGE->cm->instance,
     'context' => $PAGE->context,
@@ -128,8 +130,8 @@ if ($payment_tnx = $DB->get_record('mod_paypal', array('userid' => $USER->id, 'i
             <input type="hidden" name="cmd" value="_xclick" />
             <input type="hidden" name="charset" value="utf-8" />
             <input type="hidden" name="business" value="<?php p($paypal->businessemail)?>" />
-            <input type="hidden" name="item_name" value="<?php p($coursefullname) ?>" />
-            <input type="hidden" name="item_number" value="<?php p($courseshortname) ?>" />
+            <input type="hidden" name="item_name" value="<?php p($paypal->itemname) ?>" />
+            <input type="hidden" name="item_number" value="<?php p($paypal->itemnumber) ?>" />
             <input type="hidden" name="quantity" value="1" />
             <input type="hidden" name="on0" value="<?php print_string("user") ?>" />
             <input type="hidden" name="os0" value="<?php p($userfullname) ?>" />

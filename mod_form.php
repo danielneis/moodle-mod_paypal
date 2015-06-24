@@ -71,6 +71,23 @@ class mod_paypal_mod_form extends moodleform_mod {
         $mform->addElement('select', 'currency', get_string('currency', 'paypal'), $paypalcurrencies);
         $mform->setDefault('currency', 'BRL');
 
+        $mform->addElement('text', 'itemname', get_string('itemname', 'paypal'));
+        $mform->setType('itemname', PARAM_TEXT);
+        $mform->setDefault('itemname', '');
+
+        $mform->addElement('text', 'itemnumber', get_string('itemnumber', 'paypal'));
+        $mform->setType('itemnumber', PARAM_TEXT);
+        $mform->setDefault('itemnumber', '');
+
+        $mform->addElement('checkbox', 'mailadmins', get_string('mailadmins', 'paypal'));
+        $mform->addHelpButton('mailadmins', 'mailadmins', 'paypal');
+
+        $mform->addElement('checkbox', 'mailstudents', get_string('mailstudents', 'paypal'));
+        $mform->addHelpButton('mailstudents', 'mailstudents', 'paypal');
+
+        $mform->addElement('checkbox', 'mailteachers', get_string('mailteachers', 'paypal'));
+        $mform->addHelpButton('mailteachers', 'mailteachers', 'paypal');
+
         $this->standard_grading_coursemodule_elements();
 
         $this->standard_coursemodule_elements();
@@ -85,6 +102,12 @@ class mod_paypal_mod_form extends moodleform_mod {
         }
         if (empty($data['cost'])) {
             $errors['cost'] = get_string('emptycost', 'paypal');
+        }
+        if (empty($data['itemname'])) {
+            $errors['itemname'] = get_string('emptyitemname', 'paypal');
+        }
+        if (empty($data['itemnumber'])) {
+            $errors['itemnumber'] = get_string('emptyitemnumber', 'paypal');
         }
         return $errors;
     }
