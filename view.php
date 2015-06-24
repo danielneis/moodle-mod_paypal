@@ -81,7 +81,11 @@ if ($paypal->intro) {
     echo $OUTPUT->box(format_module_intro('paypal', $paypal, $cm->id), 'generalbox mod_introbox', 'paypalintro');
 }
 
-if ($payment_tnx = $DB->get_record('mod_paypal', array('userid' => $USER->id, 'instanceid' => $paypal->id))) {
+if ($payment_tnx = $DB->get_record('paypal_transactions',
+                                   array('userid' => $USER->id,
+                                         'instanceid' => $paypal->id,
+                                         'payment_status' => 'Completed'))) {
+
     // should double-check with paypal everytime ?
     echo get_string('paymentcompleted', 'paypal');
 
