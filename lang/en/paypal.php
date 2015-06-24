@@ -54,6 +54,7 @@ $string['messageprovider:payment_pending'] = 'A payment with PayPal is pending';
 $string['paymentcompleted'] = 'Your payment was accepted and this activity is complete. Thank you.';
 $string['paymentcompletionenabled'] = 'Student must make a payment to complete this activity';
 $string['paymentinstant'] = 'Use the button below to pay and complete the activity in minutes!';
+$string['paymentpending'] = 'There is a pending payment registered for you.';
 $string['paymentrequired'] = 'This activity requires a payment to be completed.';
 $string['paymentwaitreminder'] = 'Please note that if you already made a payment recently, it should be processing. Please wait a few minutes and refresh this page.';
 $string['paypal'] = 'PayPal';

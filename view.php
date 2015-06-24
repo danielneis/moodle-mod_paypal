@@ -83,11 +83,14 @@ if ($paypal->intro) {
 
 if ($payment_tnx = $DB->get_record('paypal_transactions',
                                    array('userid' => $USER->id,
-                                         'instanceid' => $paypal->id,
-                                         'payment_status' => 'Completed'))) {
+                                         'instanceid' => $paypal->id))) {
 
-    // should double-check with paypal everytime ?
-    echo get_string('paymentcompleted', 'paypal');
+    if ($payment_tnx->payment_status == 'Completed') {
+        // should double-check with paypal everytime ?
+        echo get_string('paymentcompleted', 'paypal');
+    } else if ($payment_tnx->payment_status == 'Pending') {
+        echo get_string('paymentpending', 'paypal');
+    }
 
 } else {
 

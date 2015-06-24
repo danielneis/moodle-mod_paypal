@@ -50,19 +50,34 @@ if (empty($_POST) or !empty($_GET)) {
 
 $req = 'cmd=_notify-validate';
 
-$data = new stdClass();
-
 foreach ($_POST as $key => $value) {
-    $req .= "&$key=".urlencode($value);
-    $data->$key = $value;
+        $req .= "&$key=".urlencode($value);
 }
 
-$custom = explode('-', $data->custom);
+$data = new stdclass();
+$data->business             = optional_param('business', '', PARAM_TEXT);
+$data->receiver_email       = optional_param('receiver_email', '', PARAM_TEXT);
+$data->receiver_id          = optional_param('receiver_id', '', PARAM_TEXT);
+$data->item_name            = optional_param('item_name', '', PARAM_TEXT);
+$data->memo                 = optional_param('memo', '', PARAM_TEXT);
+$data->tax                  = optional_param('tax', '', PARAM_TEXT);
+$data->option_name1         = optional_param('option_name1', '', PARAM_TEXT);
+$data->option_selection1_x  = optional_param('option_selection1_x', '', PARAM_TEXT);
+$data->option_name2         = optional_param('option_name2', '', PARAM_TEXT);
+$data->option_selection2_x  = optional_param('option_selection2_x', '', PARAM_TEXT);
+$data->payment_status       = optional_param('payment_status', '', PARAM_TEXT);
+$data->pending_reason       = optional_param('pending_reason', '', PARAM_TEXT);
+$data->reason_code          = optional_param('reason_code', '', PARAM_TEXT);
+$data->txn_id               = optional_param('txn_id', '', PARAM_TEXT);
+$data->parent_txn_id        = optional_param('parent_txn_id', '', PARAM_TEXT);
+$data->payment_type         = optional_param('payment_type', '', PARAM_TEXT);
+$data->payment_gross        = optional_param('mc_gross', '', PARAM_TEXT);
+$data->payment_currency     = optional_param('mc_currency', '', PARAM_TEXT);
+$custom               = optional_param('custom', '', PARAM_TEXT);
+$custom = explode('-', $custom);
 $data->userid           = (int)$custom[0];
 $data->courseid         = (int)$custom[1];
 $data->instanceid       = (int)$custom[2];
-$data->payment_gross    = $data->mc_gross;
-$data->payment_currency = $data->mc_currency;
 $data->timeupdated      = time();
 
 /// get the user and course records
@@ -114,6 +129,8 @@ if (!$result) {  /// Could not connect to PayPal - FAIL
 if (strlen($result) > 0) {
     if (strcmp($result, "VERIFIED") == 0) {          // VALID PAYMENT!
 
+        $DB->insert_record("paypal_transactions", $data);
+
         // Check the payment_status and payment_reason.
 
         // If status is not completed, just tell admin, transaction will be saved later.
@@ -122,8 +139,8 @@ if (strlen($result) > 0) {
         }
 
         // If currency is incorrectly set then someone maybe trying to cheat the system.
-        if ($data->mc_currency != $plugin_instance->currency) {
-            paypal_message_error_to_admin("Currency does not match course settings, received: ".$data->mc_currency, $data);
+        if ($data->payment_currency != $plugin_instance->currency) {
+            paypal_message_error_to_admin("Currency does not match course settings, received: ".$data->payment_currency, $data);
             die;
         }
 
@@ -197,8 +214,6 @@ if (strlen($result) > 0) {
         }
 
         // All clear!
-
-        $DB->insert_record("paypal_transactions", $data);
 
         // Update completion state.
         if ($data->payment_status == 'Completed') {
