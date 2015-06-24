@@ -134,17 +134,18 @@ if (strlen($result) > 0) {
             $eventdata = new stdClass();
             $eventdata->modulename        = 'moodle';
             $eventdata->component         = 'mod_paypal';
-            $eventdata->name              = 'paypal_mod';
+            $eventdata->name              = 'paypal_payment_pending';
             $eventdata->userfrom          = get_admin();
             $eventdata->userto            = $user;
-            $eventdata->subject           = "Moodle: PayPal payment";
-            $eventdata->fullmessage       = "Your PayPal payment is pending.";
+            $eventdata->subject           = get_string("paypalpaymentpendingsubject", 'paypal');
+            $eventdata->fullmessage       = get_string('paypalpaymentpendingmessage', 'paypal');
             $eventdata->fullmessageformat = FORMAT_PLAIN;
             $eventdata->fullmessagehtml   = '';
             $eventdata->smallmessage      = '';
             message_send($eventdata);
 
             paypal_message_error_to_admin("Payment pending", $data);
+            die;
         }
 
         // If our status is not completed or not pending on an echeck clearance then ignore and die.
@@ -204,7 +205,7 @@ if (strlen($result) > 0) {
 
         // Update completion state.
         if ($data->payment_status == 'Completed') {
-            $completion=new completion_info($course);
+            $completion = new completion_info($course);
             if ($completion->is_enabled($cm) && $plugin_instance->paymentcompletionenabled ) {
                 $completion->update_state($cm, COMPLETION_COMPLETE);
             }
@@ -232,11 +233,11 @@ if (strlen($result) > 0) {
             $eventdata = new stdClass();
             $eventdata->modulename        = 'moodle';
             $eventdata->component         = 'mod_paypal';
-            $eventdata->name              = 'paypal_payment';
+            $eventdata->name              = 'paypal_payment_completed';
             $eventdata->userfrom          = empty($teacher) ? core_user::get_support_user() : $teacher;
             $eventdata->userto            = $user;
-            $eventdata->subject           = get_string("newpaypalpaymentsubject", 'paypal');
-            $eventdata->fullmessage       = get_string('newpaypalpaymentmessage', 'paypal');
+            $eventdata->subject           = get_string("paypalpaymentcompletedsubject", 'paypal');
+            $eventdata->fullmessage       = get_string('paypalpaymentcompletedmessage', 'paypal');
             $eventdata->fullmessageformat = FORMAT_PLAIN;
             $eventdata->fullmessagehtml   = '';
             $eventdata->smallmessage      = '';
@@ -250,11 +251,11 @@ if (strlen($result) > 0) {
             $eventdata = new stdClass();
             $eventdata->modulename        = 'moodle';
             $eventdata->component         = 'mod_paypal';
-            $eventdata->name              = 'paypal_payment';
+            $eventdata->name              = 'paypal_payment_completed';
             $eventdata->userfrom          = $user;
             $eventdata->userto            = $teacher;
-            $eventdata->subject           = get_string("newpaypalpaymentsubject", 'paypal');
-            $eventdata->fullmessage       = get_string('newpaypalpaymentmessage', 'paypal');
+            $eventdata->subject           = get_string("paypalpaymentcompletedsubject", 'paypal');
+            $eventdata->fullmessage       = get_string('paypalpaymentcompletedmessage', 'paypal');
             $eventdata->fullmessageformat = FORMAT_PLAIN;
             $eventdata->fullmessagehtml   = '';
             $eventdata->smallmessage      = '';
@@ -269,11 +270,11 @@ if (strlen($result) > 0) {
                 $eventdata = new stdClass();
                 $eventdata->modulename        = 'moodle';
                 $eventdata->component         = 'mod_paypal';
-                $eventdata->name              = 'paypal_payment';
+                $eventdata->name              = 'paypal_payment_completed';
                 $eventdata->userfrom          = $user;
                 $eventdata->userto            = $admin;
-                $eventdata->subject           = get_string("newpaypalpaymentsubject", 'paypal');
-                $eventdata->fullmessage       = get_string('newpaypalpaymentmessage', 'paypal');
+                $eventdata->subject           = get_string("paypalpaymentcompletedsubject", 'paypal');
+                $eventdata->fullmessage       = get_string('paypalpaymentcompletedmessage', 'paypal');
                 $eventdata->fullmessageformat = FORMAT_PLAIN;
                 $eventdata->fullmessagehtml   = '';
                 $eventdata->smallmessage      = '';

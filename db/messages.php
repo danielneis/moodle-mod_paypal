@@ -15,22 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines the version and other meta-info about the plugin
- *
- * Setting the $plugin->version to 0 prevents the plugin from being installed.
- * See https://docs.moodle.org/dev/version.php for more info.
+ * Defines message providers (types of message sent) for the PayPal activity plugin.
  *
  * @package    mod_paypal
- * @copyright  2015 Daniel Neis - based on work of others
+ * @copyright  2012 Chris Follin
+ * @copyright  2015 Daniel Neis
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_paypal';
-$plugin->version = 2015062400;
-$plugin->release = '1';
-$plugin->requires = 2014051200;
-$plugin->maturity = MATURITY_BETA;
-$plugin->cron = 0;
-$plugin->dependencies = array();
+$messageproviders = array(
+    'paypal_payment_pending' => array(),
+    'paypal_payment_completed' => array(),
+);
