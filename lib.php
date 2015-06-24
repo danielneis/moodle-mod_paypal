@@ -441,7 +441,10 @@ function paypal_get_completion_state($course, $cm, $userid, $type) {
     // If completion option is enabled, evaluate it and return true/false 
     if ($paypal->paymentcompletionenabled) {
         // should double-check with paypal everytime ?
-        return $DB->record_exists('mod_paypal', array('userid' => $USER->id, 'instanceid' => $paypal->id));
+        return $DB->record_exists('paypal_transactions',
+                                  array('userid' => $userid,
+                                        'instanceid' => $paypal->id,
+                                        'payment_status' => 'Completed'));
     } else {
         // Completion option is not enabled so just return $type .
         return $type;
