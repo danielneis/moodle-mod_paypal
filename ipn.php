@@ -38,16 +38,17 @@ require_once($CFG->libdir . '/filelib.php');
 // the custom handler just logs exceptions and stops.
 set_exception_handler('mod_paypal_ipn_exception_handler');
 
-/// Keep out casual intruders
+// Keep out casual intruders.
 if (empty($_POST) or !empty($_GET)) {
     print_error("Sorry, you can not use the script that way.");
 }
 
-/// Read all the data from PayPal and get it ready for later;
-/// we expect only valid UTF-8 encoding, it is the responsibility
-/// of user to set it up properly in PayPal business account,
-/// it is documented in docs wiki.
-
+/**
+ * Read all the data from PayPal and get it ready for later;
+ * we expect only valid UTF-8 encoding, it is the responsibility
+ * of user to set it up properly in PayPal business account,
+ * it is documented in docs wiki.
+ */
 $req = 'cmd=_notify-validate';
 
 foreach ($_POST as $key => $value) {
@@ -80,14 +81,12 @@ $data->courseid         = (int)$custom[1];
 $data->instanceid       = (int)$custom[2];
 $data->timeupdated      = time();
 
-/// get the user and course records
-
-if (! $user = $DB->get_record("user", array("id"=>$data->userid))) {
+if (! $user = $DB->get_record("user", array("id" => $data->userid))) {
     paypal_message_error_to_admin("Not a valid user id", $data);
     die;
 }
 
-if (! $course = $DB->get_record("course", array("id"=>$data->courseid))) {
+if (! $course = $DB->get_record("course", array("id" => $data->courseid))) {
     paypal_message_error_to_admin("Not a valid course id", $data);
     die;
 }
@@ -97,14 +96,14 @@ if (! $context = context_course::instance($course->id, IGNORE_MISSING)) {
     die;
 }
 
-if (! $plugin_instance = $DB->get_record("paypal", array("id"=>$data->instanceid))) {
+if (! $plugininstance = $DB->get_record("paypal", array("id" => $data->instanceid))) {
     paypal_message_error_to_admin("Not a valid instance id", $data);
     die;
 }
 
 $cm = get_coursemodule_from_instance('paypal', $data->instanceid);
 
-/// Open a connection back to PayPal to validate the data
+// Open a connection back to PayPal to validate the data
 $paypaladdr = empty($CFG->usepaypalsandbox) ? 'www.paypal.com' : 'www.sandbox.paypal.com';
 $c = new curl();
 $options = array(
@@ -113,7 +112,7 @@ $options = array(
     'timeout' => 30,
     'CURLOPT_HTTP_VERSION' => CURL_HTTP_VERSION_1_1,
 );
-$location = "https://$paypaladdr/cgi-bin/webscr";
+$location = "https://{$paypaladdr}/cgi-bin/webscr";
 $result = $c->post($location, $req, $options);
 
 if (!$result) {  /// Could not connect to PayPal - FAIL
@@ -122,9 +121,9 @@ if (!$result) {  /// Could not connect to PayPal - FAIL
     die;
 }
 
-/// Connection is OK, so now we post the data to validate it
+// Connection is OK, so now we post the data to validate it.
 
-/// Now read the response and check if everything is OK.
+// Now read the response and check if everything is OK.
 
 if (strlen($result) > 0) {
     if (strcmp($result, "VERIFIED") == 0) {          // VALID PAYMENT!
@@ -139,7 +138,7 @@ if (strlen($result) > 0) {
         }
 
         // If currency is incorrectly set then someone maybe trying to cheat the system.
-        if ($data->payment_currency != $plugin_instance->currency) {
+        if ($data->payment_currency != $plugininstance->currency) {
             paypal_message_error_to_admin("Currency does not match course settings, received: ".$data->payment_currency, $data);
             die;
         }
@@ -178,20 +177,20 @@ if (strlen($result) > 0) {
         }
 
         // Check that the email is the one we want it to be.
-        if (core_text::strtolower($data->business) !== core_text::strtolower($plugin_instance->businessemail)) {
+        if (core_text::strtolower($data->business) !== core_text::strtolower($plugininstance->businessemail)) {
             paypal_message_error_to_admin("Business email is {$data->business} (not ".
-                                            $plugin_instance->businessemail.")", $data);
+                                            $plugininstance->businessemail.")", $data);
             die;
         }
 
         // Check that user exists.
-        if (!$user = $DB->get_record('user', array('id'=>$data->userid))) {
+        if (!$user = $DB->get_record('user', array('id' => $data->userid))) {
             paypal_message_error_to_admin("User $data->userid doesn't exist", $data);
             die;
         }
 
         // Check that course exists.
-        if (!$course = $DB->get_record('course', array('id'=>$data->courseid))) {
+        if (!$course = $DB->get_record('course', array('id' => $data->courseid))) {
             paypal_message_error_to_admin("Course $data->courseid doesn't exist", $data);
             die;
         }
@@ -199,10 +198,10 @@ if (strlen($result) > 0) {
         $coursecontext = context_course::instance($course->id, IGNORE_MISSING);
 
         // Check that amount paid is the correct amount.
-        if ( (float) $plugin_instance->cost < 0 ) {
+        if ( (float) $plugininstance->cost < 0 ) {
             $cost = (float) 0;
         } else {
-            $cost = (float) $plugin_instance->cost;
+            $cost = (float) $plugininstance->cost;
         }
 
         // Use the same rounding of floats as on the plugin form.
@@ -218,7 +217,7 @@ if (strlen($result) > 0) {
         // Update completion state.
         if ($data->payment_status == 'Completed') {
             $completion = new completion_info($course);
-            if ($completion->is_enabled($cm) && $plugin_instance->paymentcompletionenabled ) {
+            if ($completion->is_enabled($cm) && $plugininstance->paymentcompletionenabled ) {
                 $completion->update_state($cm, COMPLETION_COMPLETE);
             }
         }
@@ -232,9 +231,9 @@ if (strlen($result) > 0) {
             $teacher = false;
         }
 
-        $mailstudents = $plugin_instance->mailstudents;
-        $mailteachers = $plugin_instance->mailteachers;
-        $mailadmins   = $plugin_instance->mailadmins;
+        $mailstudents = $plugininstance->mailstudents;
+        $mailteachers = $plugininstance->mailteachers;
+        $mailadmins   = $plugininstance->mailadmins;
         $shortname = format_string($course->shortname, true, array('context' => $context));
 
         if (!empty($mailstudents)) {

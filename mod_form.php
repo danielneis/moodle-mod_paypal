@@ -63,7 +63,7 @@ class mod_paypal_mod_form extends moodleform_mod {
         $mform->setType('businessemail', PARAM_EMAIL);
         $mform->setDefault('businessemail', '');
 
-        $mform->addElement('text', 'cost', get_string('cost', 'paypal'), array('size'=>4));
+        $mform->addElement('text', 'cost', get_string('cost', 'paypal'), array('size' => 4));
         $mform->setType('cost', PARAM_FLOAT);
         $mform->setDefault('cost', format_float(0, 2, true));
 
@@ -95,7 +95,7 @@ class mod_paypal_mod_form extends moodleform_mod {
         $this->add_action_buttons();
     }
 
-    function validation($data, $files) {
+    public function validation($data, $files) {
         $errors = array();
         if (empty($data['businessemail'])) {
             $errors['businessemail'] = get_string('emptybusinessemail', 'paypal');
@@ -112,7 +112,7 @@ class mod_paypal_mod_form extends moodleform_mod {
         return $errors;
     }
 
-    function add_completion_rules() {
+    public function add_completion_rules() {
         $mform =& $this->_form;
 
         $mform->addElement('checkbox', 'paymentcompletionenabled', get_string('requirepayment', 'paypal'), get_string('paymentcompletionenabled','paypal'));
@@ -121,13 +121,13 @@ class mod_paypal_mod_form extends moodleform_mod {
         return array('paymentcompletionenabled');
     }
 
-    function completion_rule_enabled($data) {
+    public function completion_rule_enabled($data) {
         return $data['paymentcompletionenabled'];
     }
 
     public function get_currencies() {
         // See https://www.paypal.com/cgi-bin/webscr?cmd=p/sell/mc/mc_intro-outside,
-        // 3-character ISO-4217: https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_currency_codes
+        // 3-character ISO-4217: https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_currency_codes .
         $codes = array(
             'AUD', 'BRL', 'CAD', 'CHF', 'CZK', 'DKK', 'EUR', 'GBP', 'HKD', 'HUF', 'ILS', 'JPY',
             'MXN', 'MYR', 'NOK', 'NZD', 'PHP', 'PLN', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'TWD', 'USD');

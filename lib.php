@@ -433,12 +433,11 @@ function paypal_pluginfile($course, $cm, $context, $filearea, array $args, $forc
 function paypal_get_completion_state($course, $cm, $userid, $type) {
     global $DB;
 
-    // Get forum details
-    if (!$paypal = $DB->get_record('paypal',array('id'=>$cm->instance))) {
+    if (!$paypal = $DB->get_record('paypal', array('id' => $cm->instance))) {
         throw new Exception("Can't find paypal {$cm->instance}");
     }
 
-    // If completion option is enabled, evaluate it and return true/false 
+    // If completion option is enabled, evaluate it and return true/false.
     if ($paypal->paymentcompletionenabled) {
         // should double-check with paypal everytime ?
         return $DB->record_exists('paypal_transactions',
